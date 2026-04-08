@@ -89,7 +89,6 @@ export default function HistoryScreen() {
               source={{ uri: `data:image/jpeg;base64,${item.imageUrl}` }}
               className="w-14 h-14 mr-2 rounded"
             />
-
             <View className="flex-1">
               <Text className="text-sm font-bold text-gray-800">
                 {item.wasteCategory?.toUpperCase()}
@@ -144,7 +143,7 @@ export default function HistoryScreen() {
                     source={{
                       uri: `data:image/jpeg;base64,${selected.imageUrl}`,
                     }}
-                    className="h-32 w-32 rounded"
+                    className="w-14 h-14 mr-2 rounded"
                   />
                   <Text className="text-xl font-bold text-white text-center">
                     {selected.labels?.[0]?.description || "Unknown Item"}

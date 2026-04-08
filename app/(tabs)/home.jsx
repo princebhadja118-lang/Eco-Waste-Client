@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -159,13 +160,10 @@ export default function HomeScreen() {
               key={scan._id}
               className="flex-row bg-white rounded-2xl p-4 mb-3 items-center shadow-sm"
             >
-              <View
-                className={`w-12 h-12 rounded-xl ${CATEGORY_COLORS[scan.wasteCategory]} items-center justify-center mr-4`}
-              >
-                <Text className="text-2xl">
-                  {CATEGORY_ICONS[scan.wasteCategory]}
-                </Text>
-              </View>
+              <Image
+                source={{ uri: `data:image/jpeg;base64,${scan.imageUrl}` }}
+                className="w-14 h-14 mr-2 rounded"
+              />
               <View className="flex-1">
                 <Text className="text-sm font-bold text-gray-800">
                   {scan.wasteCategory.toUpperCase()}
