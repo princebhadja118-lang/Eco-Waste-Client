@@ -21,16 +21,6 @@ const CATEGORY_ICONS = {
   paper: "📄",
   unknown: "🗑️",
 };
-const CATEGORY_BG = {
-  plastic: "bg-blue-800",
-  organic: "bg-green-800",
-  metal: "bg-amber-900",
-  glass: "bg-cyan-700",
-  electronic: "bg-purple-900",
-  hazardous: "bg-red-800",
-  paper: "bg-orange-600",
-  unknown: "bg-gray-600",
-};
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();

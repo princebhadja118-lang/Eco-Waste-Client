@@ -14,26 +14,6 @@ import { useAuth } from "@/context/auth-context";
 import { useRouter } from "expo-router";
 import api from "@/constants/api";
 
-const CATEGORY_ICONS = {
-  plastic: "🧴",
-  organic: "🌿",
-  metal: "🔩",
-  glass: "🪟",
-  electronic: "📱",
-  hazardous: "☣️",
-  paper: "📄",
-  unknown: "🗑️",
-};
-const CATEGORY_BG = {
-  plastic: "bg-blue-800",
-  organic: "bg-green-800",
-  metal: "bg-amber-900",
-  glass: "bg-cyan-700",
-  electronic: "bg-purple-900",
-  hazardous: "bg-red-800",
-  paper: "bg-orange-600",
-  unknown: "bg-gray-600",
-};
 const CATEGORY_HEX = {
   plastic: "#1565c0",
   organic: "#2e7d32",
@@ -110,7 +90,6 @@ export default function HistoryScreen() {
               className="w-14 h-14 mr-2 rounded"
             />
 
-            <View></View>
             <View className="flex-1">
               <Text className="text-sm font-bold text-gray-800">
                 {item.wasteCategory?.toUpperCase()}
