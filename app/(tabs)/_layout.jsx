@@ -13,7 +13,7 @@ export default function TabLayout() {
 
   useEffect(() => {
     if (!loading && !token) router.replace("/(auth)/login");
-  }, [token, loading]);
+  }, [loading, token, router]);
 
   return (
     <Tabs
