@@ -38,7 +38,7 @@ export default function SignupScreen() {
         password,
       });
       await login(data.token, data.user);
-      router.replace("/(tabs)/home");
+      router.replace("/(auth)/login");
     } catch (error) {
       Alert.alert("Error", error.response?.data?.message || "Signup failed");
     } finally {
