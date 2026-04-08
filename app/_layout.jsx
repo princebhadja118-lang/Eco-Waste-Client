@@ -1,6 +1,7 @@
-import { Stack } from "expo-router";
-import { AuthProvider } from "@/context/auth-context";
-import { StatusBar } from "expo-status-bar";
+import { Stack } from 'expo-router';
+import { AuthProvider } from '@/context/auth-context';
+import { StatusBar } from 'expo-status-bar';
+import '../global.css';
 
 export default function RootLayout() {
   return (
@@ -8,10 +9,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="result"
-          options={{ headerShown: true, title: "Scan Result" }}
-        />
+        <Stack.Screen name="result" options={{ headerShown: true, title: 'Scan Result' }} />
       </Stack>
       <StatusBar style="auto" />
     </AuthProvider>

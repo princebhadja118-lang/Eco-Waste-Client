@@ -3,13 +3,13 @@ import {
   View,
   Text,
   FlatList,
-  StyleSheet,
-  ActivityIndicator,
   TouchableOpacity,
-  SafeAreaView,
+  ActivityIndicator,
   Modal,
   ScrollView,
+  Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "expo-router";
 import api from "@/constants/api";
@@ -24,8 +24,17 @@ const CATEGORY_ICONS = {
   paper: "📄",
   unknown: "🗑️",
 };
-
 const CATEGORY_BG = {
+  plastic: "bg-blue-800",
+  organic: "bg-green-800",
+  metal: "bg-amber-900",
+  glass: "bg-cyan-700",
+  electronic: "bg-purple-900",
+  hazardous: "bg-red-800",
+  paper: "bg-orange-600",
+  unknown: "bg-gray-600",
+};
+const CATEGORY_HEX = {
   plastic: "#1565c0",
   organic: "#2e7d32",
   metal: "#6d4c41",
@@ -35,8 +44,6 @@ const CATEGORY_BG = {
   paper: "#f57c00",
   unknown: "#555",
 };
-
-const HAZARD_COLORS = { low: "#2e7d32", medium: "#f57c00", high: "#c62828" };
 
 export default function HistoryScreen() {
   const [scans, setScans] = useState([]);
@@ -59,58 +66,59 @@ export default function HistoryScreen() {
     fetchHistory();
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-    router.replace("/(auth)/login");
-  };
-
   if (loading)
     return (
-      <ActivityIndicator style={{ flex: 1 }} size="large" color="#2e7d32" />
+      <ActivityIndicator className="flex-1" size="large" color="#2e7d32" />
     );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-green-50">
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>📋 Scan History</Text>
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Logout</Text>
+      <View className="flex-row justify-between items-center px-4 pt-4 mb-3">
+        <View>
+          <Text className="text-2xl font-bold text-green-900">
+            📋 Scan History
+          </Text>
+          {scans.length > 0 && (
+            <Text className="text-gray-400 text-xs mt-1">
+              {scans.length} scans found
+            </Text>
+          )}
+        </View>
+        <TouchableOpacity
+          className="bg-red-50 px-4 py-2 rounded-full"
+          onPress={async () => {
+            await logout();
+            router.replace("/(auth)/login");
+          }}
+        >
+          <Text className="text-red-700 font-bold text-sm">Logout</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Count */}
-      {scans.length > 0 && (
-        <Text style={styles.countText}>{scans.length} scans found</Text>
-      )}
 
       <FlatList
         data={scans}
         keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.card}
+            className="flex-row bg-white rounded-2xl p-4 mb-3 items-center shadow-sm"
             onPress={() => setSelected(item)}
           >
-            <View
-              style={[
-                styles.iconBox,
-                { backgroundColor: CATEGORY_BG[item.wasteCategory] || "#555" },
-              ]}
-            >
-              <Text style={styles.cardIcon}>
-                {CATEGORY_ICONS[item.wasteCategory] || "🗑️"}
-              </Text>
-            </View>
-            <View style={styles.cardInfo}>
-              <Text style={styles.cardCategory}>
+            <Image
+              source={{ uri: `data:image/jpeg;base64,${item.imageUrl}` }}
+              className="w-14 h-14 mr-2 rounded"
+            />
+
+            <View></View>
+            <View className="flex-1">
+              <Text className="text-sm font-bold text-gray-800">
                 {item.wasteCategory?.toUpperCase()}
               </Text>
-              <Text style={styles.cardTip} numberOfLines={1}>
+              <Text className="text-xs text-gray-500 mt-1" numberOfLines={1}>
                 {item.disposalTip}
               </Text>
-              <Text style={styles.cardDate}>
+              <Text className="text-xs text-gray-400 mt-1">
                 {new Date(item.createdAt).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "short",
@@ -118,14 +126,16 @@ export default function HistoryScreen() {
                 })}
               </Text>
             </View>
-            <Text style={styles.arrow}>›</Text>
+            <Text className="text-2xl text-gray-300 ml-2">›</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>🗑️</Text>
-            <Text style={styles.emptyText}>No scans yet</Text>
-            <Text style={styles.emptySubText}>
+          <View className="items-center mt-20">
+            <Text className="text-6xl mb-4">🗑️</Text>
+            <Text className="text-lg font-bold text-gray-400">
+              No scans yet
+            </Text>
+            <Text className="text-sm text-gray-300 mt-2">
               Start scanning waste to see history
             </Text>
           </View>
@@ -139,89 +149,81 @@ export default function HistoryScreen() {
         transparent
         onRequestClose={() => setSelected(null)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+        <View className="flex-1 bg-black/50 justify-end">
+          <View className="bg-green-50 rounded-t-3xl max-h-[90%]">
             {selected && (
               <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Modal Hero */}
+                {/* Hero */}
                 <View
-                  style={[
-                    styles.modalHero,
-                    {
-                      backgroundColor:
-                        CATEGORY_BG[selected.wasteCategory] || "#555",
-                    },
-                  ]}
+                  className="items-center py-8 rounded-t-3xl"
+                  style={{
+                    backgroundColor:
+                      CATEGORY_HEX[selected.wasteCategory] || "#555",
+                  }}
                 >
-                  <Text style={styles.modalIcon}>
-                    {CATEGORY_ICONS[selected.wasteCategory] || "🗑️"}
-                  </Text>
-                  <Text style={styles.modalItemName}>
+                  <Image
+                    source={{
+                      uri: `data:image/jpeg;base64,${selected.imageUrl}`,
+                    }}
+                    className="h-32 w-32 rounded"
+                  />
+                  <Text className="text-xl font-bold text-white text-center">
                     {selected.labels?.[0]?.description || "Unknown Item"}
                   </Text>
-                  <Text style={styles.modalCategory}>
+                  <Text className="text-white/70 text-xs tracking-widest mt-1">
                     {selected.wasteCategory?.toUpperCase()}
                   </Text>
                 </View>
 
-                <View style={styles.modalBody}>
+                <View className="p-4">
                   {/* Badges */}
-                  <View style={styles.badgeRow}>
-                    <View
-                      style={[
-                        styles.badge,
-                        {
-                          backgroundColor: selected.isRecyclable
-                            ? "#4caf50"
-                            : "#ef5350",
-                        },
-                      ]}
-                    >
-                      <Text style={styles.badgeText}>
-                        {selected.isRecyclable
-                          ? "♻️ Recyclable"
-                          : "🚫 Not Recyclable"}
-                      </Text>
+                  {(selected.isRecyclable !== undefined ||
+                    selected.hazardLevel) && (
+                    <View className="flex-row gap-2 mb-4">
+                      {selected.isRecyclable !== undefined && (
+                        <View
+                          className={`px-4 py-2 rounded-full ${selected.isRecyclable ? "bg-green-500" : "bg-red-500"}`}
+                        >
+                          <Text className="text-white font-bold text-xs">
+                            {selected.isRecyclable
+                              ? "♻️ Recyclable"
+                              : "🚫 Not Recyclable"}
+                          </Text>
+                        </View>
+                      )}
+                      {selected.hazardLevel && (
+                        <View className="px-4 py-2 rounded-full bg-orange-500">
+                          <Text className="text-white font-bold text-xs">
+                            ⚠️ {selected.hazardLevel?.toUpperCase()} Risk
+                          </Text>
+                        </View>
+                      )}
                     </View>
-                    {selected.hazardLevel && (
-                      <View
-                        style={[
-                          styles.badge,
-                          {
-                            backgroundColor:
-                              HAZARD_COLORS[selected.hazardLevel] || "#666",
-                          },
-                        ]}
-                      >
-                        <Text style={styles.badgeText}>
-                          ⚠️ {selected.hazardLevel?.toUpperCase()} Risk
-                        </Text>
-                      </View>
-                    )}
-                  </View>
+                  )}
 
-                  {/* Disposal Tip */}
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoCardTitle}>🗑️ How to Dispose</Text>
-                    <Text style={styles.infoCardText}>
+                  {/* Disposal */}
+                  <View className="bg-white rounded-2xl p-4 mb-3 shadow-sm">
+                    <Text className="text-base font-bold text-gray-800 mb-2">
+                      🗑️ How to Dispose
+                    </Text>
+                    <Text className="text-sm text-gray-600 leading-6">
                       {selected.disposalTip}
                     </Text>
                   </View>
 
-                  {/* Environmental Impact */}
+                  {/* Impact */}
                   {selected.environmentalImpact && (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.infoCardTitle}>
+                    <View className="bg-white rounded-2xl p-4 mb-3 shadow-sm">
+                      <Text className="text-base font-bold text-gray-800 mb-2">
                         🌍 Environmental Impact
                       </Text>
-                      <Text style={styles.infoCardText}>
+                      <Text className="text-sm text-gray-600 leading-6">
                         {selected.environmentalImpact}
                       </Text>
                     </View>
                   )}
 
-                  {/* Date */}
-                  <Text style={styles.modalDate}>
+                  <Text className="text-xs text-gray-400 text-center mb-4">
                     🕒 Scanned on{" "}
                     {new Date(selected.createdAt).toLocaleDateString("en-IN", {
                       day: "numeric",
@@ -230,18 +232,17 @@ export default function HistoryScreen() {
                     })}
                   </Text>
 
-                  {/* Close Button */}
                   <TouchableOpacity
-                    style={[
-                      styles.closeBtn,
-                      {
-                        backgroundColor:
-                          CATEGORY_BG[selected.wasteCategory] || "#555",
-                      },
-                    ]}
+                    className="py-4 rounded-2xl items-center mb-3"
+                    style={{
+                      backgroundColor:
+                        CATEGORY_HEX[selected.wasteCategory] || "#555",
+                    }}
                     onPress={() => setSelected(null)}
                   >
-                    <Text style={styles.closeBtnText}>Close</Text>
+                    <Text className="text-white text-base font-bold">
+                      Close
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </ScrollView>
@@ -252,126 +253,3 @@ export default function HistoryScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#f0f4f0" },
-
-  // Header
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    marginBottom: 8,
-  },
-  title: { fontSize: 22, fontWeight: "bold", color: "#1b5e20" },
-  logoutBtn: {
-    backgroundColor: "#ffebee",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  logoutText: { color: "#c62828", fontWeight: "bold", fontSize: 13 },
-  countText: {
-    paddingHorizontal: 16,
-    fontSize: 13,
-    color: "#888",
-    marginBottom: 8,
-  },
-
-  // List
-  list: { paddingHorizontal: 16, paddingBottom: 10, paddingTop: 5 },
-  card: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    alignItems: "center",
-    elevation: 10,
-  },
-  iconBox: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 14,
-  },
-  cardIcon: { fontSize: 26 },
-  cardInfo: { flex: 1 },
-  cardCategory: { fontSize: 14, fontWeight: "bold", color: "#333" },
-  cardTip: { fontSize: 12, color: "#888", marginTop: 3 },
-  cardDate: { fontSize: 11, color: "#aaa", marginTop: 3 },
-  arrow: { fontSize: 24, color: "#ccc", marginLeft: 8 },
-
-  // Empty
-  emptyContainer: { alignItems: "center", marginTop: 80 },
-  emptyIcon: { fontSize: 56, marginBottom: 12 },
-  emptyText: { fontSize: 18, fontWeight: "bold", color: "#aaa" },
-  emptySubText: { fontSize: 13, color: "#ccc", marginTop: 6 },
-
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContainer: {
-    backgroundColor: "#f0f4f0",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: "90%",
-  },
-  modalHero: {
-    alignItems: "center",
-    paddingVertical: 28,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-  },
-  modalIcon: { fontSize: 64, marginBottom: 10 },
-  modalItemName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-  },
-  modalCategory: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.75)",
-    letterSpacing: 2,
-    marginTop: 4,
-  },
-  modalBody: { padding: 16 },
-  badgeRow: { flexDirection: "row", gap: 10, marginBottom: 14 },
-  badge: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
-  badgeText: { color: "#fff", fontWeight: "bold", fontSize: 12 },
-  infoCard: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 12,
-    elevation: 2,
-  },
-  infoCardTitle: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 6,
-  },
-  infoCardText: { fontSize: 14, color: "#555", lineHeight: 22 },
-  modalDate: {
-    fontSize: 12,
-    color: "#aaa",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  closeBtn: {
-    padding: 16,
-    borderRadius: 14,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  closeBtnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-});
