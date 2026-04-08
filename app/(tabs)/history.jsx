@@ -143,7 +143,7 @@ export default function HistoryScreen() {
                     source={{
                       uri: `data:image/jpeg;base64,${selected.imageUrl}`,
                     }}
-                    className="w-14 h-14 mr-2 rounded"
+                    className="w-52 h-52 mr-2 rounded"
                   />
                   <Text className="text-xl font-bold text-white text-center">
                     {selected.labels?.[0]?.description || "Unknown Item"}
